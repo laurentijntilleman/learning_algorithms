@@ -1,11 +1,10 @@
 """
 Created on Tue Feb 17 2015
 Last update: Wed 14 Oct 2015
-
 @author: Michiel Stock
 michielfmstock@gmail.com
-
 Implementations of the kronecker RLS methods for pairs
+Version for Python 3.5
 """
 
 import numpy as np
@@ -98,7 +97,7 @@ class KroneckerRegularizedLeastSquaresGeneral:
         """
         return U_new.dot(self._W.dot(V_new.T))
 
-    def predict_LOOCV_rows_2SRLS(self, (reg_1, reg_2), preds=True, mse=False):
+    def predict_LOOCV_rows_2SRLS(self, reg_1, reg_2, preds=True, mse=False):
         """
         Uses LOOCV for the rows to estimate the mse,
         preds: return predictions
@@ -120,7 +119,7 @@ class KroneckerRegularizedLeastSquaresGeneral:
         elif mse and preds:
             return loov, mse_loocv
 
-    def predict_LOOCV_columns_2SRLS(self, (reg_1, reg_2), preds=True, mse=False):
+    def predict_LOOCV_columns_2SRLS(self, reg_1, reg_2, preds=True, mse=False):
         """
         Uses LOOCV for the columns to estimate the mse,
         preds: return predictions
@@ -142,7 +141,7 @@ class KroneckerRegularizedLeastSquaresGeneral:
         elif mse and preds:
             return loov, mse_loocv
 
-    def predict_LOOCV_both_2SRLS(self, (reg_1, reg_2), preds=True, mse=False):
+    def predict_LOOCV_both_2SRLS(self, reg_1, reg_2, preds=True, mse=False):
         """
         Uses LOOCV for new pairs to estimate the mse,
         preds: return predictions
@@ -199,7 +198,6 @@ class KroneckerRegularizedLeastSquaresGeneral:
         """
         Perfroms LOOCV for pairs, rows, columns or both for a given pair
         of regularization paramereters
-
         parameters:
                 - reg_1 : first regularization parameter
                 - reg_2 : second regularization parameter
@@ -208,16 +206,16 @@ class KroneckerRegularizedLeastSquaresGeneral:
                 - mse : return mean squared error
         """
         if method ==  'rows':
-            result = self.predict_LOOCV_rows_2SRLS((reg_1, reg_2),\
+            result = self.predict_LOOCV_rows_2SRLS(reg_1, reg_2,\
                             preds=preds, mse=mse)
         elif method ==  'columns':
-            result = self.predict_LOOCV_columns_2SRLS((reg_1, reg_2),\
+            result = self.predict_LOOCV_columns_2SRLS(reg_1, reg_2,\
                             preds=preds, mse=mse)
         elif method ==  'both':
-            result = self.predict_LOOCV_both_2SRLS((reg_1, reg_2),\
+            result = self.predict_LOOCV_both_2SRLS(reg_1, reg_2,\
                             preds=preds, mse=mse)
         elif method ==  'pairs':
-            result = self.predict_LOPO((reg_1, reg_2),\
+            result = self.predict_LOPO(reg_1, reg_2,\
                             preds=preds, mse=mse, algorithm='2SRLS')
         return result
 
@@ -257,19 +255,19 @@ class KroneckerRegularizedLeastSquaresGeneral:
         for reg_1 in reg_1_grid:
             for reg_2 in reg_2_grid:
                 if method ==  'rows':
-                    performance = self.predict_LOOCV_rows_2SRLS((reg_1, reg_2),\
+                    performance = self.predict_LOOCV_rows_2SRLS(reg_1, reg_2,\
                             preds=False, mse=True)
                 elif method ==  'columns':
-                    performance = self.predict_LOOCV_columns_2SRLS((reg_1, reg_2),\
+                    performance = self.predict_LOOCV_columns_2SRLS(reg_1, reg_2,\
                             preds=False, mse=True)
                 elif method ==  'both':
-                    performance = self.predict_LOOCV_both_2SRLS((reg_1, reg_2),\
+                    performance = self.predict_LOOCV_both_2SRLS(reg_1, reg_2,\
                             preds=False, mse=True)
                 elif method ==  'pairs':
-                    performance = self.predict_LOPO((reg_1, reg_2),\
+                    performance = self.predict_LOPO(reg_1, reg_2,\
                             preds=False, mse=True, algorithm='2SRLS')
-                if verbose: print 'Regulariser pair (%s, %s) gives MSE of %s'\
-                        %(reg_1, reg_2, performance)
+                if verbose: print('Regulariser pair (%s, %s) gives MSE of %s'\
+                        %(reg_1, reg_2, performance))
                 if performance < self.best_performance_LOOCV:
                     self.best_performance_LOOCV = performance
                     self.best_regularisation = (reg_1, reg_2)
@@ -294,7 +292,7 @@ class KroneckerRegularizedLeastSquaresGeneral:
                 self.best_performance_LOOCV = performance
                 self.best_regularisation = reg
             if verbose:
-                print 'Regulariser: %s gives MSE of %s' %(reg, performance)
+                print('Regulariser: %s gives MSE of %s' %(reg, performance))
         self.train_model(self.best_regularisation, algorithm='KRLS')
 
     def get_norm(self):
@@ -304,12 +302,12 @@ class KroneckerRegularizedLeastSquaresGeneral:
         return self.model_norm
 
     def __str__(self):
-        print 'Kronecker RLS model'
-        print 'Dimensionality of label matrix is (%s, %s)' %self._Y.shape
+        print('Kronecker RLS model')
+        print('Dimensionality of label matrix is (%s, %s)' %self._Y.shape)
         if hasattr(self, '_filtered_values'):
             # to do: add errors both side
             #print 'MSE train is %s' %self.mse_train
-            print 'Model norm is %s' %self.model_norm
+            print('Model norm is %s' %self.model_norm)
         return ''
 
 
@@ -391,41 +389,41 @@ if __name__ == "__main__":
 
     Yhat = KRLS.predict(K_u, K_v)
 
-    print np.mean((Y-Yhat)**2)
+    print(np.mean((Y-Yhat)**2))
 
-    print 'New rows'
+    print('New rows')
 
-    print 'Testing for two-step RLS'
+    print('Testing for two-step RLS')
 
     KRLS.LOOCV_model_selection_2SRLS([10**i for i in range(-10, 10)],\
         [10**i for i in range(-5, 5)], verbose = True, method='rows')
 
-    print 'Estimated row CV error: %s'\
-            %KRLS.best_performance_LOOCV
+    print('Estimated row CV error: %s'\
+            %KRLS.best_performance_LOOCV)
 
 
-    print KRLS.best_regularisation
+    print(KRLS.best_regularisation)
     KRLS.train_model(KRLS.best_regularisation)
     X_u_new = np.random.randn(n_u, p_u)
     Ynew = X_u_new.dot(W.dot(X_v.T)) + np.random.randn(n_u, n_v)*noise
 
     Yhat_new = KRLS.predict(X_u_new.dot(X_u.T), K_v)
-    print np.mean((Ynew-Yhat_new)**2)
+    print(np.mean((Ynew-Yhat_new)**2))
 
-    print 'Testing for Kronecker ridge regression'
+    print('Testing for Kronecker ridge regression')
 
     KRLS.LOOCV_model_selection_KRLS([10**i for i in range(-2, 5)],\
             verbose = True)
 
-    print KRLS.best_performance_LOOCV
-    print KRLS.best_regularisation
+    print(KRLS.best_performance_LOOCV)
+    print(KRLS.best_regularisation)
 
     Yhat_new = KRLS.predict(X_u_new.dot(X_u.T), K_v)
-    print np.mean((Ynew-Yhat_new)**2)
+    print(np.mean((Ynew-Yhat_new)**2))
 
-    print 'New both'
+    print('New both')
 
-    print 'Testing for two-step RLS'
+    print('Testing for two-step RLS')
 
     X_v_new = np.random.randn(n_v, p_v)
     Ynew = X_u_new.dot(W.dot(X_v_new.T)) + np.random.randn(n_u, n_v)*noise
@@ -433,10 +431,10 @@ if __name__ == "__main__":
     KRLS.LOOCV_model_selection_2SRLS([10**i for i in range(-10, 10)],\
         [10**i for i in range(-5, 5)], verbose = True, method='both')
 
-    print KRLS.best_performance_LOOCV, KRLS.best_regularisation
+    print(KRLS.best_performance_LOOCV, KRLS.best_regularisation)
 
     Ypred = KRLS.predict(X_u_new.dot(X_u.T), X_v_new.dot(X_v.T))
-    print np.mean((Ynew-Ypred)**2)
+    print(np.mean((Ynew-Ypred)**2))
 
     #########################################
     ##              Test LOOCV             ##
@@ -467,83 +465,72 @@ if __name__ == "__main__":
     # rows
     KRLS = KroneckerRegularizedLeastSquares(Y, K_u, K_v)
     KRLS.train_model((r1,r2))
-    row_HO_ther = KRLS.predict_LOOCV_rows_2SRLS((r1, r2))[0, :]
+    row_HO_ther = KRLS.predict_LOOCV_rows_2SRLS(r1, r2)[0, :]
 
     KRLS_HO = KroneckerRegularizedLeastSquares(Y[1:], K_u[1:][:,1:], K_v)
     KRLS_HO.train_model((r1, r2), '2SRLS')
     row_HO_exp = KRLS_HO.predict(K_u[0, 1:], K_v)
-    print 'rows: must be the same:', np.allclose(row_HO_ther, row_HO_exp)
+    print('rows: must be the same:', np.allclose(row_HO_ther, row_HO_exp))
 
     # columns
     KRLS = KroneckerRegularizedLeastSquares(Y, K_u, K_v)
     KRLS.train_model((r1,r2))
-    col_HO_ther = KRLS.predict_LOOCV_columns_2SRLS((r1, r2))[:, 0]
+    col_HO_ther = KRLS.predict_LOOCV_columns_2SRLS(r1, r2)[:, 0]
 
     KRLS_HO = KroneckerRegularizedLeastSquares(Y[:,1:], K_u, K_v[1:][:,1:])
     KRLS_HO.train_model((r1, r2), '2SRLS')
     col_HO_exp = KRLS_HO.predict(K_u, K_v[0, 1:])
-    print 'columns: must be the same:', np.allclose(col_HO_ther, col_HO_exp)
+    print('columns: must be the same:', np.allclose(col_HO_ther, col_HO_exp))
 
     # both
     KRLS = KroneckerRegularizedLeastSquares(Y, K_u, K_v)
     KRLS.train_model((r1,r2))
-    both_HO_ther = KRLS.predict_LOOCV_both_2SRLS((r1, r2))[0, 0]
+    both_HO_ther = KRLS.predict_LOOCV_both_2SRLS(r1, r2)[0, 0]
 
     KRLS_HO = KroneckerRegularizedLeastSquares(Y[1:,1:], K_u[1:][:,1:], K_v[1:][:,1:])
     KRLS_HO.train_model((r1, r2), '2SRLS')
     both_HO_exp = KRLS_HO.predict(K_u[0, 1:], K_v[0, 1:])
-    print 'both: must be the same:', np.allclose(both_HO_ther, both_HO_exp)
+    print('both: must be the same:', np.allclose(both_HO_ther, both_HO_exp))
 
     """
     #########################################
     ##      Test conditional raning        ##
     #########################################
-
     from sklearn.metrics import roc_auc_score
-
     Y = Y > 0
-
     def micro_auc(Y, Yhat):
         n_u, n_v = Y.shape
         return np.mean([roc_auc_score(Y[:,i], Yhat[:,i]) for i in range(n_v)])
-
     def instance_auc(Y, Yhat):
         n_u, n_v = Y.shape
         return np.mean([roc_auc_score(Y[i], Yhat[i]) for i in range(n_u)])
-
     def macro_auc(Y, Yhat):
         return roc_auc_score(Y.reshape(-1), Yhat.reshape(-1))
-
     KRLS = KroneckerRegularizedLeastSquares(Y, K_u, K_v)
     KRLS.train_model((10, 10))
     Yhat = KRLS.predict(K_u, K_v)
-
-    print
-    print 'Regular MSE'
-    print 'instance: %.5f' %instance_auc(Y, Yhat)
-    print 'micro: %.5f' %micro_auc(Y, Yhat)
-    print 'macro: %.5f' %macro_auc(Y, Yhat)
-    print '='*50
-
+    print('\n')
+    print('Regular MSE')
+    print('instance: %.5f' %instance_auc(Y, Yhat))
+    print('micro: %.5f' %micro_auc(Y, Yhat))
+    print('macro: %.5f' %macro_auc(Y, Yhat))
+    print('='*50)
     KRLS = KroneckerRegularizedLeastSquares(Y, K_u, K_v, loss='instance_conditional')
     KRLS.train_model((10, 10))
     Yhat = KRLS.predict(K_u, K_v)
-
-    print
-    print 'instance'
-    print 'instance: %.5f' %instance_auc(Y, Yhat)
-    print 'micro: %.5f' %micro_auc(Y, Yhat)
-    print 'macro: %.5f' %macro_auc(Y, Yhat)
-    print '='*50
-
+    print('\n')
+    print('instance')
+    print('instance: %.5f' %instance_auc(Y, Yhat))
+    print('micro: %.5f' %micro_auc(Y, Yhat))
+    print('macro: %.5f' %macro_auc(Y, Yhat))
+    print('='*50)
     KRLS = KroneckerRegularizedLeastSquares(Y, K_u, K_v, loss='micro_conditional')
     KRLS.train_model((10, 10))
     Yhat = KRLS.predict(K_u, K_v)
-
-    print
-    print 'micro'
-    print 'instance: %.5f' %instance_auc(Y, Yhat)
-    print 'micro: %.5f' %micro_auc(Y, Yhat)
-    print 'macro: %.5f' %macro_auc(Y, Yhat)
-    print '='*50
+    print('\n')
+    print('micro')
+    print('instance: %.5f' %instance_auc(Y, Yhat))
+    print('micro: %.5f' %micro_auc(Y, Yhat))
+    print('macro: %.5f' %macro_auc(Y, Yhat))
+    print('='*50)
     """
